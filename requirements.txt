@@ -1,0 +1,4 @@
+ijson
+lxml
+cssselect
+sqlite3
