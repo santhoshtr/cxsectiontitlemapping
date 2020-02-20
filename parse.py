@@ -95,7 +95,7 @@ def main():
     db = get_database()
     folder = "dumps.wikimedia.org/other/contenttranslation"
     # Recursively find the files matching the pattern
-    for path in Path(folder).rglob('cx-corpora.*.html.json'):
+    for path in sorted(Path(folder).rglob('cx-corpora.*.html.json')):
         print('Reading %s' % (path.name))
         try:
             parse_file(path.absolute(), db)
