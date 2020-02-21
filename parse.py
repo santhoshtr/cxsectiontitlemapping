@@ -48,7 +48,7 @@ def parse_file(filename, db):
                                  for element in doc.cssselect('h2, h3, h4')])
                 if title:
                     section['sourceHeader'] = title
-        elif prefix == 'item.target.content' and event == 'string':
+        elif section.get('sourceHeader') and prefix == 'item.target.content' and event == 'string':
             # This is target title
             match = re.search(r"(</h[2-4])", value)
             if match and match.start() >= 0:
@@ -66,26 +66,26 @@ def parse_file(filename, db):
                     section['sourceLanguage'], section['targetLanguage'],
                     section['sourceHeader'], section['targetHeader'],
                 )
-                count = db.execute(
+                frequency = db.execute(
                     """
-                        SELECT count(*) from titles
+                        SELECT frequency from titles
                         WHERE source_language=?
                         AND target_language=? AND source_title=?
                         AND target_title=?
                     """, params).fetchone()
-                if count[0] == 0:
+                if frequency is None:
                     # Item does not exist in database table
                     db.execute("""
                         INSERT INTO titles VALUES(?,?,?,?, 1)
                         """, params)
                 else:
                     # Item already exists. Increment the count for frequency tracking
-                    count = count[0]+1
+                    frequency = frequency[0]+1
                     db.execute("""
                             UPDATE titles SET frequency=?
                             WHERE source_language=? AND target_language=?
                             AND source_title=? AND target_title=?
-                        """, (count, *params))
+                        """, (frequency, *params))
                 index += 1
 
     print('Inserted %d items' % (index))
