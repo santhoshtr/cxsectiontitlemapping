@@ -21,6 +21,12 @@ def get_database():
             target_title TEXT,
             frequency INTEGER)
         """)
+    cursor.execute('DROP INDEX IF EXISTS title_source_target')
+
+    cursor.execute("""
+        CREATE INDEX title_source_target
+        ON titles (source_language, target_language);
+        """)
     connection.commit()
     return cursor
 
